@@ -2,6 +2,11 @@ package dev.gcastro.humblerender;
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.geom.*;
+
+import dev.gcastro.humblerender.models.Matrix3;
+import dev.gcastro.humblerender.shapes.Shape;
+import dev.gcastro.humblerender.shapes.Tetrahedron;
 
 public class DemoViewer {
 
@@ -16,17 +21,41 @@ public class DemoViewer {
         final JSlider vRotationSlider = new JSlider(SwingConstants.VERTICAL, -90, 90, 0);
         pane.add(vRotationSlider, BorderLayout.EAST);
 
-        final JPanel renderPanel = new JPanel() {
-            public void paintComponent(final Graphics g) {
-                final Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Color.BLACK);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
+        final JPanel renderPanel = renderShape(new Tetrahedron(), hRotationSlider);
+        hRotationSlider.addChangeListener(e -> renderPanel.repaint());
+        vRotationSlider.addChangeListener(e -> renderPanel.repaint());
+
         pane.add(renderPanel, BorderLayout.CENTER);
+
 
         frame.setSize(400, 400);
         frame.setVisible(true);
 
+    }
+
+
+    public static JPanel renderShape(final Shape shape, final JSlider hRotationSlider){
+        return new JPanel() {
+            public void paintComponent(final Graphics g) {
+                
+                final Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.BLACK);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+               
+
+                double hRotation = Math.toRadians(hRotationSlider.getValue());
+                Matrix3 rotationMatrix = new Matrix3(new double[] {
+                Math.cos(hRotation), 0, -Math.sin(hRotation),
+                0, 1, 0,
+                Math.sin(hRotation), 0, Math.cos(hRotation)
+                });
+
+                g2.translate(getWidth() / 2, getHeight() / 2);
+                g2.setColor(Color.WHITE);
+                for(Path2D path: shape.blueprint(rotationMatrix)){
+                    g2.draw(path);
+                }
+            }
+        };
     }
 }
