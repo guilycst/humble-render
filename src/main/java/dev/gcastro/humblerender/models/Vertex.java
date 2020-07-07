@@ -22,6 +22,17 @@ public class Vertex {
 
     public double getZ() {
         return z;
-    } 
-    
+    }
+
+    public void translate(int containerWidth, int containerHeight){
+        this.x += containerWidth / 2;
+        this.y += containerHeight / 2;
+    }
+
+	public void normalize(double normalLength) {
+        this.x /= normalLength;
+        this.y /= normalLength;
+        this.z /= normalLength;
+	}
+
 }
